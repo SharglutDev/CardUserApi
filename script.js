@@ -1,17 +1,18 @@
-const container = document.querySelector(".container");
+const cards = document.querySelector("#cards");
+const previousArrow = document.querySelector("#previous");
+const nextArrow = document.querySelector("#next");
+const arrows = document.querySelectorAll(".arrow");
 
-const fetchData = async () => {
-  const response = await fetch("https://reqres.in/api/users?page=1");
+let pageDisplayed = 1;
+
+const fetchData = async (pageNum) => {
+  const response = await fetch(`https://reqres.in/api/users?page=${pageNum}`);
   const data = await response.json();
-  return data;
-};
-
-const displayData = async () => {
-  const data = await fetchData();
-  data.data.map((user, index) => {
+  console.log(data);
+  data.data.map((user) => {
     const card = document.createElement("div");
     card.classList.add("card");
-    container.appendChild(card);
+    cards.appendChild(card);
     card.innerHTML = `
         <div class="avatar">
             <img src="${user.avatar}" alt="avatar" />
@@ -24,5 +25,22 @@ const displayData = async () => {
       `;
   });
 };
+fetchData();
 
-displayData();
+arrows.forEach((arrow) => {
+  arrow.addEventListener("click", () => {
+    if (arrow.id === "next" && pageDisplayed === 1) {
+      cards.innerHTML = "";
+      pageDisplayed++;
+      fetchData(pageDisplayed);
+      previousArrow.classList.remove("disabled");
+      nextArrow.classList.add("disabled");
+    } else if (arrow.id === "previous" && pageDisplayed === 2) {
+      cards.innerHTML = "";
+      pageDisplayed--;
+      fetchData(pageDisplayed);
+      previousArrow.classList.add("disabled");
+      nextArrow.classList.remove("disabled");
+    }
+  });
+});
